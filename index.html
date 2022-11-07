@@ -46,25 +46,24 @@
     var flipbook = document.getElementById('flipbook');
     var scale = 1; 
     let pdf;
-    const pageMargin = 20;// 可調整
+    const pageMargin = 40;// 可調整
     const bookW = 552;
     const bookH = 793;
     const ratio = bookH / (bookW * 2);
-    $(function() {
-        // getpdf(url);
-        loadApp()
-    });
+    $( document ).ready(() => {
+        loadApp();
+        setRatio();
+        updateScale();
+        
+    })
 
 		
 function loadApp() {
     $(flipbook).turn({
         width: bookW * 2 * scale,
         height: bookH * scale
-        //是否置中
-        //display: 'single',//單頁顯示
     });
-    setRatio();
-    updateScale();
+    
 }
 
 function updateScale() {
@@ -73,8 +72,8 @@ function updateScale() {
 
 async function setRatio() {
     let tmpScale = (window.innerWidth - ( pageMargin * 2) )/ ( bookW * 2);
-    if(bookH * scale > window.innerHeight - ( pageMargin * 2) ){
-        tmpScale = (window.innerHeight - ( pageMargin * 2) )/ ( bookH );
+    if(bookH * tmpScale > window.innerHeight - ( pageMargin * 2) ){
+        tmpScale = (window.innerHeight - ( pageMargin * 2) )/ bookH ;
     }
     // check width and cal height to finalize scale
     scale = tmpScale;
