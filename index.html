@@ -14,88 +14,75 @@
         #flipbook{
             margin: 0 auto !important;
         }
+        .bookContainer{
+            display: grid;
+            place-items: center;
+            width: 100vw;
+            height: 100vh;
+            background: #3d3d3a;
+        }
     </style>
 </head>
 <body>
     <div class="bookContainer">
 
         <div id="flipbook">
-            
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_01.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_02.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_03.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_04.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_05.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_06.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_07.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_08.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_09.jpg" />
+            <img src="src/img/1027-2022_AMO Summit_CN-62-HTML PDF_Page_10.jpg" />
         </div>
     </div>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js'></script>
-    <script src='https://mozilla.github.io/pdf.js/build/pdf.js'></script>
     <script src='src/script/turn.min.js'></script>
 <script >
     var url = 'src/pdf/1027-2022_AMO Summit_CN-62-HTML PDF.pdf'; 
     var flipbook = document.getElementById('flipbook');
-var scale = 1; // 可調整
+    var scale = 1; 
+    let pdf;
+    const pageMargin = 20;// 可調整
+    const bookW = 552;
+    const bookH = 793;
+    const ratio = bookH / (bookW * 2);
+    $(function() {
+        // getpdf(url);
+        loadApp()
+    });
 
-$(function() {
-  getpdf(url);
-});
-
-
-function getpdf(url){
-
-  var pdfjsLib = window['pdfjs-dist/build/pdf'];
-  pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';  //放自己專案中worker.js的路徑
-
-
-  var loadingTask = pdfjsLib.getDocument(url);
-  loadingTask.promise.then(function(pdf) {
-  //根據總頁數新增固定的div和canvas
-  console.log("總頁數",pdf.numPages);
-  for (let i = 1; i <= pdf.numPages;i++) {
-    let id = 'canvaspage' + i;
-    let div = document.createElement('div');
-    div.innerHTML = '<canvas id="' + id + '"></canvas>';
-    flipbook.append(div);
-    setcanvas(i,pdf,id);
-  }
-            
-  //呼叫turn方法
-    loadApp()					
-  })
-}
-
-//將pdf新增到canvas裡面
-function setcanvas(i,pdf,id){
-
-  pdf.getPage(i).then(function(page) {
-    var viewport = page.getViewport({scale: scale});
- 
-    let canvas = document.getElementById(id);
-    let context = canvas.getContext('2d');
-
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    // Render PDF page into canvas context
-    let renderContext = {
-    canvasContext: context,
-    viewport: viewport
-    };
-
-    page.render(renderContext);
-  })
-}
 		
 function loadApp() {
-        $(flipbook).turn({
-          autoCenter: true,
-          width: 552 * 2,
-          height: 793
-          //是否置中
-          //display: 'single',//單頁顯示
-        });
+    $(flipbook).turn({
+        width: bookW * 2 * scale,
+        height: bookH * scale
+        //是否置中
+        //display: 'single',//單頁顯示
+    });
+    setRatio();
 }
-// //當畫面縮放時，要改變外殼大小，如果你想固定，不一定要加
-// window.addEventListener('resize',function(e){
-//     flipbook.style.width="";
-//   flipbook.style.height="";
-//  $(flipbook).turn("size", window.innerWidth,window.innerHeight*0.8);
-// })
+
+function updateScale() {
+    $(flipbook).turn("size", bookW * 2 * scale, bookH * scale);
+}
+
+async function setRatio() {
+    let tmpScale = (window.innerWidth - ( pageMargin * 2) )/ ( bookW * 2);
+    if(bookH * scale > window.innerHeight - ( pageMargin * 2) ){
+        tmpScale = (window.innerHeight - ( pageMargin * 2) )/ ( bookH );
+    }
+    // check width and cal height to finalize scale
+    scale = tmpScale;
+}
+// 當畫面縮放時，要改變外殼大小，如果你想固定，不一定要加
+window.addEventListener('resize',function(e){
+    setRatio();
+    updateScale();
+})
 
 </script>
 </body>
