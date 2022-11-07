@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Test</title>
+    <style>
+        html, body{
+            padding:0;
+            margin: 0;
+            overflow: hidden;
+        }
+        #flipbook{
+            margin: 0 auto !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="bookContainer">
+
+        <div id="flipbook">
+            
+        </div>
+    </div>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js'></script>
+    <script src='https://mozilla.github.io/pdf.js/build/pdf.js'></script>
+    <script src='http://www.turnjs.com/lib/turn.min.js'></script>
+<script >
+    var url = 'src/pdf/1027-2022_AMO Summit_CN-62-HTML PDF.pdf'; 
+    var flipbook = document.getElementById('flipbook');
+var scale = 1; // 可調整
+
+$(function() {
+  getpdf(url);
+});
+
+
+function getpdf(url){
+
+  var pdfjsLib = window['pdfjs-dist/build/pdf'];
+  pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';  //放自己專案中worker.js的路徑
+
+
+  var loadingTask = pdfjsLib.getDocument(url);
+  loadingTask.promise.then(function(pdf) {
+  //根據總頁數新增固定的div和canvas
+  console.log("總頁數",pdf.numPages);
+  for (let i = 1; i <= pdf.numPages;i++) {
+    let id = 'canvaspage' + i;
+    let div = document.createElement('div');
+    div.innerHTML = '<canvas id="' + id + '"></canvas>';
+    flipbook.append(div);
+    setcanvas(i,pdf,id);
+  }
+            
+  //呼叫turn方法
+    loadApp()					
+  })
+}
+
+//將pdf新增到canvas裡面
+function setcanvas(i,pdf,id){
+
+  pdf.getPage(i).then(function(page) {
+    var viewport = page.getViewport({scale: scale});
+ 
+    let canvas = document.getElementById(id);
+    let context = canvas.getContext('2d');
+
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    // Render PDF page into canvas context
+    let renderContext = {
+    canvasContext: context,
+    viewport: viewport
+    };
+
+    page.render(renderContext);
+  })
+}
+		
+function loadApp() {
+        $(flipbook).turn({
+          autoCenter: true,
+          width: 552 * 2,
+          height: 793
+          //是否置中
+          //display: 'single',//單頁顯示
+        });
+}
+// //當畫面縮放時，要改變外殼大小，如果你想固定，不一定要加
+// window.addEventListener('resize',function(e){
+//     flipbook.style.width="";
+//   flipbook.style.height="";
+//  $(flipbook).turn("size", window.innerWidth,window.innerHeight*0.8);
+// })
+
+</script>
+</body>
+
+</html>
